@@ -1,0 +1,203 @@
+#UC10-UC12
+ 
+ mysql>
+mysql> use payroll_service;
+Database changed
+mysql> describe company;
++--------+--------------+------+-----+---------+-------+
+| Field  | Type         | Null | Key | Default | Extra |
++--------+--------------+------+-----+---------+-------+
+| com_id | int unsigned | NO   | PRI | NULL    |       |
+| emp_id | int unsigned | NO   | MUL | NULL    |       |
++--------+--------------+------+-----+---------+-------+
+2 rows in set (6.10 sec)
+
+mysql> select*from user_cons_columns
+    -> where table_name='company';
+ERROR 1146 (42S02): Table 'payroll_service.user_cons_columns' doesn't exist
+mysql> select column_name,constraint_name
+    -> from information_schema.key_column_usage
+    -> where table_name='company';
++-------------+-----------------+
+| COLUMN_NAME | CONSTRAINT_NAME |
++-------------+-----------------+
+| com_id      | PRIMARY         |
+| emp_id      | company_ibfk_1  |
++-------------+-----------------+
+2 rows in set (0.54 sec)
+
+mysql> alter table company drop foreign key  company_ibfk_1;
+Query OK, 0 rows affected (2.40 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table company drop emp_id;
+Query OK, 0 rows affected (2.99 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> describe company;
++--------+--------------+------+-----+---------+-------+
+| Field  | Type         | Null | Key | Default | Extra |
++--------+--------------+------+-----+---------+-------+
+| com_id | int unsigned | NO   | PRI | NULL    |       |
++--------+--------------+------+-----+---------+-------+
+1 row in set (0.00 sec)
+
+mysql> alter table company add com_name varchar(150) not null;
+Query OK, 0 rows affected (1.52 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> describe company;
++----------+--------------+------+-----+---------+-------+
+| Field    | Type         | Null | Key | Default | Extra |
++----------+--------------+------+-----+---------+-------+
+| com_id   | int unsigned | NO   | PRI | NULL    |       |
+| com_name | varchar(150) | NO   |     | NULL    |       |
++----------+--------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> insert into company (com_id,com_name)values(1,'Google'),(2,'Amazon');
+Query OK, 2 rows affected (1.14 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select *from company;
++--------+----------+
+| com_id | com_name |
++--------+----------+
+|      1 | Google   |
+|      2 | Amazon   |
++--------+----------+
+2 rows in set (0.23 sec)
+
+mysql> describe payroll;
++-------------+--------------+------+-----+---------+-------+
+| Field       | Type         | Null | Key | Default | Extra |
++-------------+--------------+------+-----+---------+-------+
+| emp_id      | int unsigned | NO   | MUL | NULL    |       |
+| basic_pay   | double       | NO   |     | NULL    |       |
+| deductions  | double       | NO   |     | NULL    |       |
+| taxable_pay | double       | NO   |     | NULL    |       |
+| tax         | double       | NO   |     | NULL    |       |
+| net_pay     | double       | NO   |     | NULL    |       |
++-------------+--------------+------+-----+---------+-------+
+6 rows in set (1.01 sec)
+
+mysql> insert into payroll(1,1000000,500000,500000,100000,400000),(2,2000000,500000,1500000,500000,1000000),(3000000,1000000,2000000,500000,1500000);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1,1000000,500000,500000,100000,400000),(2,2000000,500000,1500000,500000,1000000)' at line 1
+mysql> insert into payroll values(1,1000000,500000,500000,100000,400000),(2,2000000,500000,1500000,500000,1000000),(3,3000000,1000000,2000000,500000,1500000);
+Query OK, 3 rows affected (0.55 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select *from payroll;
++--------+-----------+------------+-------------+--------+---------+
+| emp_id | basic_pay | deductions | taxable_pay | tax    | net_pay |
++--------+-----------+------------+-------------+--------+---------+
+|      1 |   1000000 |     500000 |      500000 | 100000 |  400000 |
+|      2 |   2000000 |     500000 |     1500000 | 500000 | 1000000 |
+|      3 |   3000000 |    1000000 |     2000000 | 500000 | 1500000 |
++--------+-----------+------------+-------------+--------+---------+
+3 rows in set (0.00 sec)
+
+mysql> describe department;
++----------+--------------+------+-----+---------+----------------+
+| Field    | Type         | Null | Key | Default | Extra          |
++----------+--------------+------+-----+---------+----------------+
+| dep_id   | int unsigned | NO   | PRI | NULL    | auto_increment |
+| dep_name | varchar(150) | NO   |     | NULL    |                |
++----------+--------------+------+-----+---------+----------------+
+2 rows in set (1.18 sec)
+
+mysql> insert into department values(1,'Sales'),(2,'HR'),(3,'Marketing');
+Query OK, 3 rows affected (1.28 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select *from department;;
++--------+-----------+
+| dep_id | dep_name  |
++--------+-----------+
+|      1 | Sales     |
+|      2 | HR        |
+|      3 | Marketing |
++--------+-----------+
+3 rows in set (0.00 sec)
+
+ERROR:
+No query specified
+
+mysql> describe emp_dep;
++--------+--------------+------+-----+---------+-------+
+| Field  | Type         | Null | Key | Default | Extra |
++--------+--------------+------+-----+---------+-------+
+| emp_id | int unsigned | NO   | MUL | NULL    |       |
+| dep_id | int unsigned | NO   | MUL | NULL    |       |
++--------+--------------+------+-----+---------+-------+
+2 rows in set (0.10 sec)
+
+mysql> insert into emp_dep values(1,1),(2,2),(3,3);
+Query OK, 3 rows affected (0.26 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select *from emp_dep;
++--------+--------+
+| emp_id | dep_id |
++--------+--------+
+|      1 |      1 |
+|      2 |      2 |
+|      3 |      3 |
++--------+--------+
+3 rows in set (0.00 sec)
+
+mysql> select sum(net_pay) from payroll;
++--------------+
+| sum(net_pay) |
++--------------+
+|      2900000 |
++--------------+
+1 row in set (0.25 sec)
+
+mysql> select employees. name,avg(net_pay) from employees,payroll where employees.emp_id=payroll.emp_id;
++------+-------------------+
+| name | avg(net_pay)      |
++------+-------------------+
+| Bill | 966666.6666666666 |
++------+-------------------+
+1 row in set (0.41 sec)
+
+mysql> select employees. gender,avg(net_pay) from employees,payroll where employees.emp_id=payroll.emp_id group by gender;
++--------+--------------+
+| gender | avg(net_pay) |
++--------+--------------+
+| M      |       950000 |
+| F      |      1000000 |
++--------+--------------+
+2 rows in set (0.10 sec)
+
+mysql> select employees. gender,count(gender) from employees,payroll where employees.emp_id=payroll.emp_id group by gender;
++--------+---------------+
+| gender | count(gender) |
++--------+---------------+
+| M      |             2 |
+| F      |             1 |
++--------+---------------+
+2 rows in set (0.01 sec)
+
+mysql> select * from employees,payroll where employees.emp_id=payroll.emp_id;
++--------+---------+---------------+---------+--------+--------+-----------+------------+-------------+--------+---------+
+| emp_id | name    | phoneNumber   | address | gender | emp_id | basic_pay | deductions | taxable_pay | tax    | net_pay |
++--------+---------+---------------+---------+--------+--------+-----------+------------+-------------+--------+---------+
+|      1 | Bill    | 91 8888888888 | XYZ     | M      |      1 |   1000000 |     500000 |      500000 | 100000 |  400000 |
+|      2 | Terisa  | 91 9999999999 | DEF     | F      |      2 |   2000000 |     500000 |     1500000 | 500000 | 1000000 |
+|      3 | Charlie | 91 7777777777 | ASDF    | M      |      3 |   3000000 |    1000000 |     2000000 | 500000 | 1500000 |
++--------+---------+---------------+---------+--------+--------+-----------+------------+-------------+--------+---------+
+3 rows in set (0.00 sec)
+
+mysql> select salary from employees,payroll where employees.emp_id=payroll.emp_id and employees.name='Bill';
+ERROR 1054 (42S22): Unknown column 'salary' in 'field list'
+mysql> select e.name,p.basic_pay,p.deductions,p.net_pay from employees e,payroll p where employees.emp_id=payroll.emp_id and employees.name='Bill';
+ERROR 1054 (42S22): Unknown column 'employees.emp_id' in 'where clause'
+mysql> select e.name,p.basic_pay,p.deductions,p.net_pay from employees e,payroll p where e.emp_id=p.emp_id and e.name='Bill';
++------+-----------+------------+---------+
+| name | basic_pay | deductions | net_pay |
++------+-----------+------------+---------+
+| Bill |   1000000 |     500000 |  400000 |
++------+-----------+------------+---------+
+1 row in set (0.02 sec)
